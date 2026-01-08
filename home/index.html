@@ -1,0 +1,378 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MontBlanc - Sistema de Gestão</title>
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+  <button class="theme-toggle" aria-label="Alternar tema">
+    <div class="theme-toggle-icon">
+      <div class="sun-icon"></div>
+      <div class="moon-icon"></div>
+    </div>
+  </button>
+
+  <aside class="sidebar">
+    <button class="toggle-btn">
+      <span class="toggle-icon"></span>
+    </button>
+    
+    <div class="logo-container">
+      <a class="logo" href="#">MontBlanc</a>
+    </div>
+
+    <ul class="nav-list">
+      <li><a href="#" data-page="inicio" class="active">Início</a></li>
+      <li><a href="#" data-page="quartos">Quartos</a></li>
+      <li><a href="#" data-page="cozinha">Cozinha</a></li>
+      <li><a href="#" data-page="estoque">Estoque</a></li>
+      <li><a href="#" data-page="seguranca">Segurança</a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <p>© 2025 MontBlanc</p>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header>
+      <h1>Bem-vindo ao MontBlanc</h1>
+    </header>
+
+    <main>
+      <!-- DASHBOARD -->
+      <section class="page active" id="inicio">
+        <!-- Notificações -->
+        <div id="notificacoesContainer"></div>
+
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalClientes">0</div>
+            <div class="stat-label">Clientes Atendidos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="quartosOcupados">0</div>
+            <div class="stat-label">Quartos Ocupados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="pedidosPendentes">0</div>
+            <div class="stat-label">Pedidos Ativos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="receitaTotal">R$ 0</div>
+            <div class="stat-label">Receita Total</div>
+          </div>
+        </div>
+
+        <!-- Alertas de Estoque -->
+        <div class="content-card" id="alertasEstoque" style="display: none;">
+          <h2>⚠️ Alertas de Estoque Baixo</h2>
+          <div id="alertasLista"></div>
+        </div>
+
+        <div class="content-card">
+          <h2>Suítes Mais Utilizadas</h2>
+          <ul class="rank-list" id="suitesRank"></ul>
+        </div>
+
+        <div class="content-card">
+          <h2>Pratos Mais Pedidos</h2>
+          <ul class="rank-list" id="pratosRank"></ul>
+        </div>
+
+        <div class="content-card">
+          <h2>📊 Relatório de Vendas</h2>
+          <button class="add-btn" onclick="dashboardManager.gerarRelatorio()">Gerar Relatório Completo</button>
+        </div>
+      </section>
+
+      <!-- QUARTOS -->
+      <section class="page" id="quartos">
+        <div class="section-header">
+          <button class="add-btn" id="addQuartoBtn">+ Adicionar Quarto</button>
+          <div class="filtros">
+            <button class="filtro-btn active" data-filtro="todos" data-tipo="quarto">Todos</button>
+            <button class="filtro-btn" data-filtro="vago" data-tipo="quarto">Vagos</button>
+            <button class="filtro-btn" data-filtro="ocupado" data-tipo="quarto">Ocupados</button>
+            <button class="filtro-btn" data-filtro="limpando" data-tipo="quarto">Limpando</button>
+          </div>
+        </div>
+
+        <div class="items-grid" id="quartosGrid"></div>
+
+        <div class="paginacao">
+          <button class="paginacao-btn" id="prevPageQuartos">← Anterior</button>
+          <span class="paginacao-info"><span id="currentPageQuartos">1</span> / <span id="totalPagesQuartos">1</span></span>
+          <button class="paginacao-btn" id="nextPageQuartos">Próxima →</button>
+        </div>
+      </section>
+
+      <!-- COZINHA -->
+      <section class="page" id="cozinha">
+        <div class="section-header">
+          <button class="add-btn" id="addPratoBtn">+ Criar Prato</button>
+          <div class="filtros">
+            <button class="filtro-btn active" data-filtro="todos" data-tipo="pedido">Todos</button>
+            <button class="filtro-btn" data-filtro="pendente" data-tipo="pedido">Pendentes</button>
+            <button class="filtro-btn" data-filtro="preparo" data-tipo="pedido">Em Preparo</button>
+            <button class="filtro-btn" data-filtro="pronto" data-tipo="pedido">Prontos</button>
+            <button class="filtro-btn" data-filtro="entregue" data-tipo="pedido">Entregues</button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="color: var(--accent-red); margin: 0;">Pedidos Ativos</h3>
+          <button class="btn-action" onclick="cozinhaManager.limparPedidosEntregues()" style="background: var(--status-ocupado); margin: 0;">
+            🗑️ Limpar Pedidos Entregues
+          </button>
+        </div>
+        <div id="pedidosLista"></div>
+
+        <h3 style="color: var(--accent-red); margin: 2rem 0 1rem;">Cardápio</h3>
+        <div class="pratos-grid" id="pratosGrid"></div>
+      </section>
+
+      <!-- ESTOQUE -->
+      <section class="page" id="estoque">
+        <div class="section-header">
+          <button class="add-btn" id="addEstoqueBtn">+ Adicionar Item</button>
+          <div class="filtros" id="filtrosEstoque">
+            <button class="filtro-btn active" data-filtro="todos" data-tipo="estoque">Todos</button>
+          </div>
+        </div>
+
+        <div class="items-grid" id="estoqueGrid"></div>
+
+        <div class="paginacao">
+          <button class="paginacao-btn" id="prevPageEstoque">← Anterior</button>
+          <span class="paginacao-info"><span id="currentPageEstoque">1</span> / <span id="totalPagesEstoque">1</span></span>
+          <button class="paginacao-btn" id="nextPageEstoque">Próxima →</button>
+        </div>
+      </section>
+
+      <!-- SEGURANÇA -->
+      <section class="page" id="seguranca">
+        <div class="content-card">
+          <h2>Segurança</h2>
+          <p>Conteúdo da página de segurança será implementado aqui.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Adicionar Quarto -->
+  <div class="modal" id="quartoModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeQuartoModal">×</button>
+      <h2>Adicionar Quarto</h2>
+      <form id="quartoForm">
+        <div class="form-group">
+          <label for="quartoNome">Nome da Suíte</label>
+          <input type="text" id="quartoNome" required>
+        </div>
+        <div class="form-group">
+          <label for="quartoNumero">Número</label>
+          <input type="text" id="quartoNumero" required>
+        </div>
+        <div class="form-group">
+          <label for="quartoTipo">Tipo</label>
+          <select id="quartoTipo" required>
+            <option value="standard">Standard</option>
+            <option value="vip">VIP</option>
+            <option value="master">Master</option>
+            <option value="master-duplex">Master Duplex</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quartoValorHora">Valor por Hora (R$)</label>
+          <input type="number" id="quartoValorHora" step="0.01" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="quartoValorExtra">Valor Hora Extra (R$)</label>
+          <input type="number" id="quartoValorExtra" step="0.01" min="0" required>
+        </div>
+        <div class="form-buttons">
+          <button type="button" class="btn-cancelar" id="cancelQuartoBtn">Cancelar</button>
+          <button type="submit" class="btn-salvar">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Status Quarto -->
+  <div class="modal" id="statusModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeStatusModal">×</button>
+      <h2>Alterar Status do Quarto</h2>
+      <div class="status-options">
+        <div class="status-option vago" data-status="vago">
+          <div class="status-option-icon">✅</div>
+          <div class="status-option-text">
+            <h3>Vago</h3>
+            <p>Quarto disponível para hospedagem</p>
+          </div>
+        </div>
+        <div class="status-option ocupado" data-status="ocupado">
+          <div class="status-option-icon">🔴</div>
+          <div class="status-option-text">
+            <h3>Ocupado</h3>
+            <p>Quarto está sendo utilizado</p>
+          </div>
+        </div>
+        <div class="status-option limpando" data-status="limpando">
+          <div class="status-option-icon">🧹</div>
+          <div class="status-option-text">
+            <h3>Limpando</h3>
+            <p>Quarto em processo de limpeza</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalhes do Quarto -->
+  <div class="modal" id="detalhesQuartoModal">
+    <div class="modal-content large">
+      <button class="modal-close" id="closeDetalhesModal">×</button>
+      <h2 id="detalhesQuartoTitulo">Detalhes do Quarto</h2>
+      
+      <div class="quarto-detalhes">
+        <div class="detalhe-section">
+          <h3>Informações</h3>
+          <div class="info-row">
+            <span class="info-label">Status:</span>
+            <span id="detalhesStatus"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tempo de Uso:</span>
+            <span id="detalhesTempo">--</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Valor Atual:</span>
+            <span id="detalhesValor">R$ 0,00</span>
+          </div>
+        </div>
+
+        <div class="detalhe-section">
+          <h3>Fazer Pedido</h3>
+          <div class="form-group">
+            <label>Selecione o Prato</label>
+            <select id="selecionarPrato"></select>
+          </div>
+          <button class="btn-action" id="btnFazerPedido">Enviar Pedido</button>
+        </div>
+
+        <div class="detalhe-section">
+          <h3>Pedidos do Quarto</h3>
+          <div class="pedidos-lista" id="pedidosQuarto"></div>
+        </div>
+
+        <div class="total-conta">
+          <h3>Total da Conta</h3>
+          <div class="valor-total" id="valorTotalConta">R$ 0,00</div>
+          <button class="btn-action success" id="btnFecharConta" style="margin-top: 1rem;">Fechar Conta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Adicionar Item Estoque -->
+  <div class="modal" id="estoqueModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeEstoqueModal">×</button>
+      <h2 id="estoqueModalTitulo">Adicionar Item ao Estoque</h2>
+      <form id="estoqueForm">
+        <input type="hidden" id="estoqueEditId">
+        <div class="form-group">
+          <label for="estoqueNome">Nome do Item</label>
+          <input type="text" id="estoqueNome" required>
+        </div>
+        <div class="form-group">
+          <label for="estoqueCategoria">Categoria</label>
+          <select id="estoqueCategoria" required>
+            <option value="carnes">Carnes</option>
+            <option value="congelados">Alimentos Congelados</option>
+            <option value="bebidas">Bebidas</option>
+            <option value="bebidas-alcoolicas">Bebidas Alcoólicas</option>
+            <option value="laticinios">Laticínios</option>
+            <option value="hortifruti">Hortifruti</option>
+            <option value="padaria">Padaria</option>
+            <option value="limpeza">Produtos de Limpeza</option>
+            <option value="higiene">Produtos de Higiene</option>
+            <option value="outros">Outros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="estoqueQuantidade">Quantidade</label>
+          <input type="number" id="estoqueQuantidade" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="estoqueUnidade">Unidade</label>
+          <select id="estoqueUnidade" required>
+            <option value="un">Unidade (un)</option>
+            <option value="kg">Quilograma (kg)</option>
+            <option value="g">Grama (g)</option>
+            <option value="L">Litro (L)</option>
+            <option value="ml">Mililitro (ml)</option>
+            <option value="cx">Caixa (cx)</option>
+            <option value="pct">Pacote (pct)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="estoqueQuantidadeMinima">⚠️ Quantidade Mínima (Alerta de Estoque Baixo)</label>
+          <input type="number" id="estoqueQuantidadeMinima" min="0" step="0.01" value="10" required>
+          <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
+            Quando o estoque atingir este valor, aparecerá um alerta no dashboard
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="estoqueDescricao">Descrição (opcional)</label>
+          <textarea id="estoqueDescricao"></textarea>
+        </div>
+        <div class="form-buttons">
+          <button type="button" class="btn-cancelar" id="cancelEstoqueBtn">Cancelar</button>
+          <button type="submit" class="btn-salvar">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Criar Prato -->
+  <div class="modal" id="pratoModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closePratoModal">×</button>
+      <h2>Criar Novo Prato</h2>
+      <form id="pratoForm">
+        <div class="form-group">
+          <label for="pratoNome">Nome do Prato</label>
+          <input type="text" id="pratoNome" required>
+        </div>
+        <div class="form-group">
+          <label for="pratoValor">Valor de Venda (R$)</label>
+          <input type="number" id="pratoValor" step="0.01" min="0" required>
+        </div>
+        <div class="form-group">
+          <label>Ingredientes do Estoque</label>
+          <div id="ingredientesSelecionados"></div>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <select id="estoqueSelect" style="flex: 1;">
+              <option value="">Selecione um item</option>
+            </select>
+            <input type="number" id="quantidadeIngrediente" placeholder="Qtd" step="0.01" min="0.01" style="width: 80px;">
+            <button type="button" class="btn-add-ingrediente" id="btnAddIngrediente" style="width: auto; padding: 0.8rem 1.5rem; margin: 0;">Adicionar</button>
+          </div>
+        </div>
+        <div class="form-buttons">
+          <button type="button" class="btn-cancelar" id="cancelPratoBtn">Cancelar</button>
+          <button type="submit" class="btn-salvar">Criar Prato</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
