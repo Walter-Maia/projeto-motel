@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MontBlanc - Portal do Cliente</title>
+  <link rel="stylesheet" href="cliente.css">
+</head>
+<body>
+  <!-- Tela de Login -->
+  <div id="loginScreen" class="screen active">
+    <div class="login-container">
+      <div class="logo">MontBlanc</div>
+      <h1>Bem-vindo!</h1>
+      <p class="subtitle">Informe o número da sua suíte para acessar</p>
+      
+      <form id="loginForm">
+        <div class="input-group">
+          <label for="numeroQuarto">Número da Suíte</label>
+          <input type="text" id="numeroQuarto" placeholder="Ex: 140" required autofocus>
+        </div>
+        <button type="submit" class="btn-primary">Acessar</button>
+      </form>
+      
+      <div id="errorMessage" class="error-message"></div>
+      
+      <div style="margin-top: 20px; text-align: center;">
+        <small style="color: #888;">
+          💡 Dica: Aperte F12 para ver os logs de debug
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tela Principal -->
+  <div id="mainScreen" class="screen">
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-small">MontBlanc</div>
+        <div class="quarto-info">
+          <span class="quarto-label">Suíte</span>
+          <span class="quarto-numero" id="quartoNumero"></span>
+        </div>
+        <button class="btn-logout" id="btnLogout">Sair</button>
+      </div>
+    </header>
+
+    <!-- Navegação -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="cardapio">🍽️ Cardápio</button>
+      <button class="tab-btn" data-tab="pedidos">📋 Meus Pedidos</button>
+      <button class="tab-btn" data-tab="conta">💰 Minha Conta</button>
+    </nav>
+
+    <main class="main-content">
+      <!-- Tab Cardápio -->
+      <section id="cardapio" class="tab-content active">
+        <h2>Cardápio</h2>
+        <div class="search-bar">
+          <input type="text" id="searchPrato" placeholder="Buscar prato...">
+        </div>
+        <div id="cardapioGrid" class="cardapio-grid"></div>
+      </section>
+
+      <!-- Tab Meus Pedidos -->
+      <section id="pedidos" class="tab-content">
+        <h2>Meus Pedidos</h2>
+        <div id="pedidosLista" class="pedidos-lista"></div>
+      </section>
+
+      <!-- Tab Minha Conta -->
+      <section id="conta" class="tab-content">
+        <h2>Minha Conta</h2>
+        
+        <div class="conta-card">
+          <div class="conta-info">
+            <div class="info-row">
+              <span class="label">Tempo de Hospedagem:</span>
+              <span class="value" id="tempoHospedagem">--</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Valor da Suíte:</span>
+              <span class="value" id="valorSuite">R$ 0,00</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Consumo de Pedidos:</span>
+              <span class="value" id="valorPedidos">R$ 0,00</span>
+            </div>
+          </div>
+          
+          <div class="conta-total">
+            <span class="total-label">Total a Pagar:</span>
+            <span class="total-valor" id="totalPagar">R$ 0,00</span>
+          </div>
+
+          <div class="detalhamento">
+            <h3>Detalhamento de Pedidos</h3>
+            <div id="detalhamentoPedidos" class="detalhamento-lista"></div>
+          </div>
+
+          <button class="btn-fechar-conta" id="btnSolicitarFechamento">
+            Solicitar Fechamento da Conta
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Confirmação de Pedido -->
+  <div id="modalConfirmar" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">×</button>
+      <h2>Confirmar Pedido</h2>
+      <div id="modalPratoInfo" class="prato-info-modal"></div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" id="btnCancelarPedido">Cancelar</button>
+        <button class="btn-confirmar" id="btnConfirmarPedido">Confirmar Pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="cliente.js"></script>
+</body>
+</html>
