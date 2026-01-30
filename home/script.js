@@ -49,7 +49,7 @@ class Sidebar {
     e.currentTarget.classList.add('active');
 
     this.sections.forEach(section => section.classList.remove('active'));
-    
+
     let sectionId = e.currentTarget.getAttribute('data-page');
     let section = document.getElementById(sectionId);
     section.classList.add('active');
@@ -88,9 +88,9 @@ class DashboardManager {
   verificarNotificacoes() {
     const notificacoes = JSON.parse(localStorage.getItem('notificacoes')) || [];
     const naoLidas = notificacoes.filter(n => !n.lida);
-    
+
     const container = document.getElementById('notificacoesContainer');
-    
+
     if (naoLidas.length === 0) {
       container.innerHTML = '';
       return;
@@ -118,13 +118,13 @@ class DashboardManager {
   processarFechamento(notifId) {
     const notificacoes = JSON.parse(localStorage.getItem('notificacoes')) || [];
     const notif = notificacoes.find(n => n.id === notifId);
-    
+
     if (!notif) return;
 
     const quarto = quartos.find(q => q.id === notif.quartoId);
     if (quarto) {
       document.querySelector('[data-page="quartos"]').click();
-      
+
       setTimeout(() => {
         quartosManager.abrirDetalhesModal(quarto.id);
       }, 300);
@@ -138,12 +138,12 @@ class DashboardManager {
   dispensarNotificacao(notifId) {
     const notificacoes = JSON.parse(localStorage.getItem('notificacoes')) || [];
     const notif = notificacoes.find(n => n.id === notifId);
-    
+
     if (notif) {
       notif.lida = true;
       localStorage.setItem('notificacoes', JSON.stringify(notificacoes));
     }
-    
+
     this.verificarNotificacoes();
   }
 
@@ -166,7 +166,7 @@ class DashboardManager {
     const suitesOrdenadas = Object.entries(suitesContador)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
-    
+
     const suitesHTML = suitesOrdenadas.length > 0
       ? suitesOrdenadas.map(([nome, qtd]) => `
           <li class="rank-item">
@@ -175,7 +175,7 @@ class DashboardManager {
           </li>
         `).join('')
       : '<li class="rank-item"><span>Nenhum dado disponível</span></li>';
-    
+
     document.getElementById('suitesRank').innerHTML = suitesHTML;
 
     const pratosContador = {};
@@ -189,7 +189,7 @@ class DashboardManager {
     const pratosOrdenados = Object.entries(pratosContador)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
-    
+
     const pratosHTML = pratosOrdenados.length > 0
       ? pratosOrdenados.map(([nome, qtd]) => `
           <li class="rank-item">
@@ -198,7 +198,7 @@ class DashboardManager {
           </li>
         `).join('')
       : '<li class="rank-item"><span>Nenhum dado disponível</span></li>';
-    
+
     document.getElementById('pratosRank').innerHTML = pratosHTML;
 
     this.verificarEstoqueBaixo();
@@ -208,12 +208,12 @@ class DashboardManager {
   verificarEstoqueBaixo() {
     const alertaContainer = document.getElementById('alertasEstoque');
     const alertasLista = document.getElementById('alertasLista');
-    
+
     const itensAbaixo = estoque.filter(item => {
       const limiteMinimo = item.quantidadeMinima || 10;
       return item.quantidade <= limiteMinimo;
     });
-    
+
     if (itensAbaixo.length === 0) {
       alertaContainer.style.display = 'none';
       return;
@@ -299,7 +299,7 @@ class QuartosManager {
     this.quartoSelecionado = null;
     this.quartoDetalhes = null;
     this.intervalId = null;
-    
+
     this.init();
   }
 
@@ -308,7 +308,7 @@ class QuartosManager {
     document.getElementById('closeQuartoModal').addEventListener('click', () => this.fecharModal());
     document.getElementById('cancelQuartoBtn').addEventListener('click', () => this.fecharModal());
     document.getElementById('quartoForm').addEventListener('submit', (e) => this.salvarQuarto(e));
-    
+
     document.getElementById('closeStatusModal').addEventListener('click', () => this.fecharStatusModal());
     document.getElementById('closeDetalhesModal').addEventListener('click', () => this.fecharDetalhesModal());
 
@@ -344,7 +344,7 @@ class QuartosManager {
   abrirStatusModal(id) {
     this.quartoSelecionado = id;
     const quarto = quartos.find(q => q.id === id);
-    
+
     if (quarto.status === 'ocupado') {
       this.abrirDetalhesModal(id);
     } else {
@@ -361,14 +361,14 @@ class QuartosManager {
     this.quartoDetalhes = quartos.find(q => q.id === id);
     if (!this.quartoDetalhes) return;
 
-    document.getElementById('detalhesQuartoTitulo').textContent = 
+    document.getElementById('detalhesQuartoTitulo').textContent =
       `${this.quartoDetalhes.nome} - #${this.quartoDetalhes.numero}`;
-    
+
     this.atualizarDetalhes();
     this.atualizarSelectPratos();
-    
+
     document.getElementById('detalhesQuartoModal').classList.add('active');
-    
+
     this.intervalId = setInterval(() => this.atualizarDetalhes(), 60000);
   }
 
@@ -401,32 +401,32 @@ class QuartosManager {
       const diffMs = agora - inicio;
       const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
       const diffMinutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      
-      document.getElementById('detalhesTempo').textContent = 
+
+      document.getElementById('detalhesTempo').textContent =
         `${diffHoras}h ${diffMinutos}min`;
-      
+
       const valorQuarto = this.calcularValorQuarto(quarto);
-      document.getElementById('detalhesValor').textContent = 
+      document.getElementById('detalhesValor').textContent =
         `R$ ${valorQuarto.toFixed(2)}`;
     }
 
     const pedidosQuarto = pedidos.filter(p => p.quartoId === quarto.id);
     const pedidosHTML = pedidosQuarto.length > 0
       ? pedidosQuarto.map(p => {
-          let statusIcon = '⏳ Pendente';
-          if (p.status === 'preparo') statusIcon = '🔄 Em preparo';
-          if (p.status === 'pronto') statusIcon = '✅ Pronto';
-          if (p.status === 'entregue') statusIcon = '✔️ Entregue';
-          
-          return `
+        let statusIcon = '⏳ Pendente';
+        if (p.status === 'preparo') statusIcon = '🔄 Em preparo';
+        if (p.status === 'pronto') statusIcon = '✅ Pronto';
+        if (p.status === 'entregue') statusIcon = '✔️ Entregue';
+
+        return `
             <div class="pedido-item">
               <strong>${p.prato}</strong> - R$ ${p.valor.toFixed(2)}
               <br><small>${statusIcon}</small>
             </div>
           `;
-        }).join('')
+      }).join('')
       : '<p style="color: var(--text-secondary);">Nenhum pedido</p>';
-    
+
     document.getElementById('pedidosQuarto').innerHTML = pedidosHTML;
 
     const valorTotal = this.calcularTotalConta(quarto);
@@ -435,11 +435,11 @@ class QuartosManager {
 
   calcularValorQuarto(quarto) {
     if (!quarto.inicioUso) return 0;
-    
+
     const inicio = new Date(quarto.inicioUso);
     const agora = new Date();
     const diffHoras = (agora - inicio) / (1000 * 60 * 60);
-    
+
     if (diffHoras <= 1) {
       return quarto.valorHora;
     } else {
@@ -542,7 +542,7 @@ class QuartosManager {
 
   salvarQuarto(e) {
     e.preventDefault();
-    
+
     const quarto = {
       id: Date.now(),
       nome: document.getElementById('quartoNome').value,
@@ -556,7 +556,7 @@ class QuartosManager {
 
     quartos.push(quarto);
     localStorage.setItem('quartos', JSON.stringify(quartos));
-    
+
     this.fecharModal();
     this.renderizar();
   }
@@ -573,13 +573,13 @@ class QuartosManager {
     const quarto = quartos.find(q => q.id === this.quartoSelecionado);
     if (quarto) {
       quarto.status = novoStatus;
-      
+
       if (novoStatus === 'ocupado') {
         quarto.inicioUso = new Date().toISOString();
       } else if (novoStatus === 'vago') {
         quarto.inicioUso = null;
       }
-      
+
       localStorage.setItem('quartos', JSON.stringify(quartos));
       this.fecharStatusModal();
       this.renderizar();
@@ -589,7 +589,7 @@ class QuartosManager {
   filtrar(e) {
     document.querySelectorAll('.filtro-btn[data-tipo="quarto"]').forEach(btn => btn.classList.remove('active'));
     e.target.classList.add('active');
-    
+
     this.filtroAtual = e.target.getAttribute('data-filtro');
     this.paginaAtual = 1;
     this.renderizar();
@@ -612,7 +612,7 @@ class QuartosManager {
   proximaPagina() {
     const quartosFiltrados = this.getQuartosFiltrados();
     const totalPaginas = Math.ceil(quartosFiltrados.length / this.itensPorPagina);
-    
+
     if (this.paginaAtual < totalPaginas) {
       this.paginaAtual++;
       this.renderizar();
@@ -622,7 +622,7 @@ class QuartosManager {
   renderizar() {
     const quartosFiltrados = this.getQuartosFiltrados();
     const totalPaginas = Math.max(1, Math.ceil(quartosFiltrados.length / this.itensPorPagina));
-    
+
     if (this.paginaAtual > totalPaginas) {
       this.paginaAtual = totalPaginas;
     }
@@ -655,7 +655,7 @@ class QuartosManager {
 
     document.getElementById('currentPageQuartos').textContent = this.paginaAtual;
     document.getElementById('totalPagesQuartos').textContent = totalPaginas;
-    
+
     document.getElementById('prevPageQuartos').disabled = this.paginaAtual === 1;
     document.getElementById('nextPageQuartos').disabled = this.paginaAtual === totalPaginas;
   }
@@ -812,14 +812,14 @@ class CozinhaManager {
   filtrar(e) {
     document.querySelectorAll('.filtro-btn[data-tipo="pedido"]').forEach(btn => btn.classList.remove('active'));
     e.target.classList.add('active');
-    
+
     this.filtroAtual = e.target.getAttribute('data-filtro');
     this.renderizar();
   }
 
   renderizar() {
     let pedidosFiltrados = pedidos.filter(p => p.status !== 'entregue');
-    
+
     if (this.filtroAtual !== 'todos') {
       if (this.filtroAtual === 'entregue') {
         pedidosFiltrados = pedidos.filter(p => p.status === 'entregue');
@@ -891,7 +891,7 @@ class CozinhaManager {
 
   limparPedidosEntregues() {
     const entregues = pedidos.filter(p => p.status === 'entregue');
-    
+
     if (entregues.length === 0) {
       alert('Não há pedidos entregues para limpar.');
       return;
@@ -923,7 +923,7 @@ class EstoqueManager {
     this.paginaAtual = 1;
     this.itensPorPagina = 9;
     this.editando = false;
-    
+
     this.init();
   }
 
@@ -971,7 +971,7 @@ class EstoqueManager {
 
   salvarItem(e) {
     e.preventDefault();
-    
+
     const editId = document.getElementById('estoqueEditId').value;
 
     if (editId) {
@@ -998,7 +998,7 @@ class EstoqueManager {
     }
 
     localStorage.setItem('estoque', JSON.stringify(estoque));
-    
+
     this.fecharModal();
     this.atualizarFiltros();
     this.renderizar();
@@ -1015,15 +1015,15 @@ class EstoqueManager {
 
   atualizarFiltros() {
     const categorias = [...new Set(estoque.map(i => i.categoria))];
-    
+
     let filtrosHTML = '<button class="filtro-btn active" data-filtro="todos" data-tipo="estoque">Todos</button>';
-    
+
     categorias.forEach(cat => {
       filtrosHTML += `<button class="filtro-btn" data-filtro="${cat}" data-tipo="estoque">${this.getCategoriaLabel(cat)}</button>`;
     });
-    
+
     document.getElementById('filtrosEstoque').innerHTML = filtrosHTML;
-    
+
     document.querySelectorAll('.filtro-btn[data-tipo="estoque"]').forEach(btn => {
       btn.addEventListener('click', (e) => this.filtrar(e));
     });
@@ -1032,7 +1032,7 @@ class EstoqueManager {
   filtrar(e) {
     document.querySelectorAll('.filtro-btn[data-tipo="estoque"]').forEach(btn => btn.classList.remove('active'));
     e.target.classList.add('active');
-    
+
     this.filtroAtual = e.target.getAttribute('data-filtro');
     this.paginaAtual = 1;
     this.renderizar();
@@ -1055,7 +1055,7 @@ class EstoqueManager {
   proximaPagina() {
     const itensFiltrados = this.getItensFiltrados();
     const totalPaginas = Math.ceil(itensFiltrados.length / this.itensPorPagina);
-    
+
     if (this.paginaAtual < totalPaginas) {
       this.paginaAtual++;
       this.renderizar();
@@ -1065,7 +1065,7 @@ class EstoqueManager {
   renderizar() {
     const itensFiltrados = this.getItensFiltrados();
     const totalPaginas = Math.max(1, Math.ceil(itensFiltrados.length / this.itensPorPagina));
-    
+
     if (this.paginaAtual > totalPaginas) {
       this.paginaAtual = totalPaginas;
     }
@@ -1090,9 +1090,9 @@ class EstoqueManager {
           <div class="estoque-nome">${item.nome}</div>
           <div class="estoque-categoria">${this.getCategoriaLabel(item.categoria)}</div>
           <div class="estoque-quantidade">${item.quantidade} ${item.unidade}</div>
-          ${item.quantidade <= (item.quantidadeMinima || 10) ? 
-            `<div style="color: var(--status-limpando); font-weight: 600; margin-top: 0.5rem;">⚠️ Estoque baixo!</div>` : 
-            ''}
+          ${item.quantidade <= (item.quantidadeMinima || 10) ?
+          `<div style="color: var(--status-limpando); font-weight: 600; margin-top: 0.5rem;">⚠️ Estoque baixo!</div>` :
+          ''}
           <div style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">
             Alerta quando ≤ ${item.quantidadeMinima || 10} ${item.unidade}
           </div>
@@ -1103,7 +1103,7 @@ class EstoqueManager {
 
     document.getElementById('currentPageEstoque').textContent = this.paginaAtual;
     document.getElementById('totalPagesEstoque').textContent = totalPaginas;
-    
+
     document.getElementById('prevPageEstoque').disabled = this.paginaAtual === 1;
     document.getElementById('nextPageEstoque').disabled = this.paginaAtual === totalPaginas;
   }
@@ -1125,6 +1125,113 @@ class EstoqueManager {
   }
 }
 
+// Portaria Manager
+class PortariaManager {
+  constructor() {
+    this.quartoSelecionado = null;
+    this.init();
+  }
+
+  init() {
+    document.getElementById('closePortariaModal').addEventListener('click', () => this.fecharModal());
+    document.getElementById('btnIniciarEstadia').addEventListener('click', () => this.iniciarEstadia());
+
+    // Atualiza a grid quando a aba Portaria for clicada
+    document.querySelector('[data-page="portaria"]').addEventListener('click', () => this.renderizar());
+  }
+
+  renderizar() {
+    const grid = document.getElementById('portariaGrid');
+    // Importante: recarregar a lista caso tenha mudado em outra aba
+    const listaAtualizada = JSON.parse(localStorage.getItem('quartos')) || [];
+    // Atualiza a referência global se necessário, ou usa local
+    quartos = listaAtualizada;
+
+    const quartosVagos = quartos.filter(q => q.status === 'vago');
+
+    if (quartosVagos.length === 0) {
+      grid.innerHTML = `
+                <div class="empty-state">
+                    <h3>Não há quartos vagos no momento</h3>
+                    <p>Verifique a aba "Quartos" para ver status de limpeza/ocupados.</p>
+                </div>
+            `;
+      return;
+    }
+
+    grid.innerHTML = quartosVagos.map(quarto => `
+            <div class="portaria-card" onclick="portariaManager.abrirModal(${quarto.id})">
+                <div class="portaria-card-header">
+                    <h3>#${quarto.numero}</h3>
+                    <span>${this.getTipoLabel(quarto.tipo)}</span>
+                </div>
+                <div class="portaria-card-body">
+                    <div class="portaria-card-info">
+                         ${quarto.nome}
+                    </div>
+                     <div class="portaria-card-price">
+                        R$ ${quarto.valorHora.toFixed(2)} /h
+                    </div>
+                </div>
+            </div>
+        `).join('');
+  }
+
+  abrirModal(id) {
+    this.quartoSelecionado = quartos.find(q => q.id === id);
+    if (!this.quartoSelecionado) return;
+
+    document.getElementById('portariaQuartoTitulo').textContent = `Quarto #${this.quartoSelecionado.numero} - ${this.quartoSelecionado.nome}`;
+    document.getElementById('portariaQuartoTipo').textContent = this.getTipoLabel(this.quartoSelecionado.tipo);
+    document.getElementById('portariaQuartoValor').textContent = `R$ ${this.quartoSelecionado.valorHora.toFixed(2)} /h`;
+
+    // Comodidades placeholder (futuro: vir do objeto quarto)
+    document.getElementById('portariaQuartoComodidades').textContent = "Ar Condicionado, TV Smart, Frigobar, Hidromassagem (verificar)";
+
+    document.getElementById('portariaModal').classList.add('active');
+  }
+
+  fecharModal() {
+    document.getElementById('portariaModal').classList.remove('active');
+    this.quartoSelecionado = null;
+  }
+
+  iniciarEstadia() {
+    if (!this.quartoSelecionado) return;
+
+    if (confirm(`Confirmar entrada no quarto ${this.quartoSelecionado.numero}?`)) {
+      // Atualiza status do quarto
+      this.quartoSelecionado.status = 'ocupado';
+      this.quartoSelecionado.inicioUso = new Date().toISOString();
+
+      // Salva no localStorage update global list
+      const index = quartos.findIndex(q => q.id === this.quartoSelecionado.id);
+      if (index !== -1) {
+        quartos[index] = this.quartoSelecionado;
+        localStorage.setItem('quartos', JSON.stringify(quartos));
+      }
+
+      // Atualiza UI
+      this.fecharModal();
+      this.renderizar();
+      dashboardManager.atualizar(); // Atualiza contadores do dashboard
+
+      // Log
+      alert(`Estadia iniciada com sucesso no quarto ${this.quartoSelecionado.numero}!`);
+    }
+  }
+
+  getTipoLabel(tipo) {
+    const labels = {
+      'standard': 'Standard',
+      'vip': 'VIP',
+      'master': 'Master',
+      'master-duplex': 'Master Duplex'
+    };
+    return labels[tipo] || tipo;
+  }
+}
+
 // Inicializar
 const themeManager = new ThemeManager();
 const sidebar = new Sidebar();
@@ -1134,6 +1241,7 @@ const dashboardManager = new DashboardManager();
 const quartosManager = new QuartosManager();
 const cozinhaManager = new CozinhaManager();
 const estoqueManager = new EstoqueManager();
+const portariaManager = new PortariaManager();
 
 // Atualizar dashboard inicial
 dashboardManager.iniciar();

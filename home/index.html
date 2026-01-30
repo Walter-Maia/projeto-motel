@@ -1,11 +1,13 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MontBlanc - Sistema de Gestão</title>
   <link href="style.css" rel="stylesheet">
 </head>
+
 <body>
 
   <button class="theme-toggle" aria-label="Alternar tema">
@@ -19,13 +21,14 @@
     <button class="toggle-btn">
       <span class="toggle-icon"></span>
     </button>
-    
+
     <div class="logo-container">
       <a class="logo" href="#">MontBlanc</a>
     </div>
 
     <ul class="nav-list">
       <li><a href="#" data-page="inicio" class="active">Início</a></li>
+      <li><a href="#" data-page="portaria">Portaria</a></li>
       <li><a href="#" data-page="quartos">Quartos</a></li>
       <li><a href="#" data-page="cozinha">Cozinha</a></li>
       <li><a href="#" data-page="estoque">Estoque</a></li>
@@ -105,7 +108,8 @@
 
         <div class="paginacao">
           <button class="paginacao-btn" id="prevPageQuartos">← Anterior</button>
-          <span class="paginacao-info"><span id="currentPageQuartos">1</span> / <span id="totalPagesQuartos">1</span></span>
+          <span class="paginacao-info"><span id="currentPageQuartos">1</span> / <span
+              id="totalPagesQuartos">1</span></span>
           <button class="paginacao-btn" id="nextPageQuartos">Próxima →</button>
         </div>
       </section>
@@ -125,7 +129,8 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <h3 style="color: var(--accent-red); margin: 0;">Pedidos Ativos</h3>
-          <button class="btn-action" onclick="cozinhaManager.limparPedidosEntregues()" style="background: var(--status-ocupado); margin: 0;">
+          <button class="btn-action" onclick="cozinhaManager.limparPedidosEntregues()"
+            style="background: var(--status-ocupado); margin: 0;">
             🗑️ Limpar Pedidos Entregues
           </button>
         </div>
@@ -148,7 +153,8 @@
 
         <div class="paginacao">
           <button class="paginacao-btn" id="prevPageEstoque">← Anterior</button>
-          <span class="paginacao-info"><span id="currentPageEstoque">1</span> / <span id="totalPagesEstoque">1</span></span>
+          <span class="paginacao-info"><span id="currentPageEstoque">1</span> / <span
+              id="totalPagesEstoque">1</span></span>
           <button class="paginacao-btn" id="nextPageEstoque">Próxima →</button>
         </div>
       </section>
@@ -160,7 +166,59 @@
           <p>Conteúdo da página de segurança será implementado aqui.</p>
         </div>
       </section>
+
+      <!-- PORTARIA / RECEPÇÃO RAPIDA -->
+      <section class="page" id="portaria">
+        <div class="section-header">
+          <h2>Portaria - Quartos Disponíveis</h2>
+          <div class="filtros">
+            <!-- Filtros se necessário futuramente -->
+          </div>
+        </div>
+
+        <div class="portaria-grid" id="portariaGrid">
+          <!-- Cards grandes de quartos vagos serão gerados aqui via JS -->
+        </div>
+      </section>
     </main>
+  </div>
+
+  <!-- Modal Pré-visualização Portaria -->
+  <div class="modal" id="portariaModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closePortariaModal">×</button>
+      <h2 id="portariaQuartoTitulo">Quarto X</h2>
+
+      <div class="portaria-preview">
+        <!-- Espaço para fotos (futuro carrossel) -->
+        <div class="quarto-imagem-preview"
+          style="background-color: #ddd; height: 150px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+          <span style="color: #666;">Foto do Quarto</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Tipo:</span>
+          <span id="portariaQuartoTipo" style="font-weight: bold;">Standard</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Comodidades:</span>
+          <span id="portariaQuartoComodidades" style="font-size: 0.9rem; color: var(--text-secondary);">Ar, TV,
+            Frigobar...</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Valor Hora:</span>
+          <span id="portariaQuartoValor" style="font-size: 1.2rem; color: var(--accent-green); font-weight: bold;">R$
+            0,00</span>
+        </div>
+
+        <hr style="margin: 1rem 0; border: 0; border-top: 1px solid var(--border-color);">
+
+        <button class="btn-action success" id="btnIniciarEstadia"
+          style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+          ✅ Iniciar Estadia Agora
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal Adicionar Quarto -->
@@ -238,7 +296,7 @@
     <div class="modal-content large">
       <button class="modal-close" id="closeDetalhesModal">×</button>
       <h2 id="detalhesQuartoTitulo">Detalhes do Quarto</h2>
-      
+
       <div class="quarto-detalhes">
         <div class="detalhe-section">
           <h3>Informações</h3>
@@ -361,8 +419,10 @@
             <select id="estoqueSelect" style="flex: 1;">
               <option value="">Selecione um item</option>
             </select>
-            <input type="number" id="quantidadeIngrediente" placeholder="Qtd" step="0.01" min="0.01" style="width: 80px;">
-            <button type="button" class="btn-add-ingrediente" id="btnAddIngrediente" style="width: auto; padding: 0.8rem 1.5rem; margin: 0;">Adicionar</button>
+            <input type="number" id="quantidadeIngrediente" placeholder="Qtd" step="0.01" min="0.01"
+              style="width: 80px;">
+            <button type="button" class="btn-add-ingrediente" id="btnAddIngrediente"
+              style="width: auto; padding: 0.8rem 1.5rem; margin: 0;">Adicionar</button>
           </div>
         </div>
         <div class="form-buttons">
@@ -375,4 +435,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>
